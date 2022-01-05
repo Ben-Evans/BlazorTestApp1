@@ -1,0 +1,62 @@
+﻿@page "/fetchdata/{Id:int}/{Act?}"
+
+@using BlazorApp1.Shared
+@using Syncfusion.Blazor.Inputs
+@inject HttpClient Http
+
+<PageTitle>Weather Forecast</PageTitle>
+
+<h1>Weather forecast</h1>
+
+<h3>
+    @(Act switch
+    {
+        "edit" => $"Edit Weather Forecast ({Id})",
+        "add" => $"Add Weather Forecast ({Id})",
+        _ => $"Get Weather Forecast ({Id})"
+    })
+</h3>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (forecast == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+        <SfTextBox CssClass="e-outline" Placeholder="Outlined" FloatLabelType="@FloatLabelType.Auto"></SfTextBox>
+    </div>
+    @*<EditForm Model="@forecast" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <InputDate id="date" @bind-Value="forecast.Date" />
+        <InputNumber id="tempC" @bind-Value="forecast.TemperatureC" />
+        <!-- <InputNumber id="tempF" readonly>forecast.TemperatureF</InputNumber> -->
+        <InputText id="summary" @bind-Value="forecast.Summary" />
+
+        <button type="submit">Submit</button>
+    </EditForm>*@
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public string? Act { get; set; }
+
+    private WeatherForecast forecast;
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecast = (await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast")).First();
+    }
+
+    private void HandleValidSubmit()
+    {
+        var value = $"{forecast.Date}, {forecast.TemperatureC}, {forecast.TemperatureF}, {forecast.Summary}";
+    }
+}
